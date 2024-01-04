@@ -1,15 +1,27 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useEffect } from "react";
 
 const FormLogin : React.FC = () => {
    const navigate = useNavigate();
-   const User = [{
-    username: 'minhhieu',
-    password: '123456'
-   }, {
-    username: 'buihieu',
-    password: '123456'
-   }]
+
+   const [data, setData] = useState([])
+
+   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/users"
+        );
+        setData(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -26,13 +38,14 @@ const FormLogin : React.FC = () => {
     setPassword(event.target.value);
   };
   const checkAccount = () => {
-    const index = User.findIndex(e => e.username === username && e.password === password)
+    const index = data.findIndex((e: any)  => e.username === username && e.phone === password)
     if (index === -1) {
         alert('Sai mật khẩu hoặc tài khoản!!!')
     return 
     }
 
     localStorage.setItem('isLoggedIn', 'true')
+    localStorage.setItem('loginAll', JSON.stringify(data[index]))
     navigate('/about')
   }
   return (
@@ -54,6 +67,7 @@ const FormLogin : React.FC = () => {
             value={password}
             onChange={handleChangePassword}
           />
+                
         </div>
         <div>
           <button type="submit" className="rounded-full w-64 h-12 bg-emerald-400 mt-7 mb-7 hover:bg-emerald-500">Login</button>
